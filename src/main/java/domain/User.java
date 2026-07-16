@@ -2,7 +2,6 @@ package domain;
 
 public class User {
     private String userId;
-    private String password;
     private String userName;
 
     // 로그인용 키
@@ -15,12 +14,11 @@ public class User {
 
     public User() {}
 
-    public User(String userId, String password, String userName,
+    public User(String userId, String userName,
                 String publicKey, String encryptedPrivateKey,
                 String chatPublicKey, String encryptedChatPrivateKey) {
 
         this.userId = userId;
-        this.password = password;
         this.userName = userName;
         this.publicKey = publicKey;
         this.encryptedPrivateKey = encryptedPrivateKey;
@@ -32,9 +30,6 @@ public class User {
     // getter/setter
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
 
     public String getUserName() { return userName; }
     public void setUserName(String userName) { this.userName = userName; }

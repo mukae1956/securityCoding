@@ -1,0 +1,12 @@
+server (user db, alice db, bob db)
+alice db 안엔 alice의 개인키만 저장
+	-> 개인키를 암호화할 때 어차피 그 안에 키가 저장이 됨
+	-> 비밀번호를 저장할 필요가 없음
+user db 안엔 공개키만 저장 
+AES256 -> KEY : 32Bytes/IV : 16Bytes
+AES384 -> 46Bytes -> IV에 대한 random값이 없어도 그냥 가능!!
+
+
+
+# 개인 프로젝트 요약서
+어떤 기술을 이용해서 프로젝트를 진행했는지 자세히 요약

@@ -51,9 +51,7 @@ public class ChatService {
 
         byte[] decryptedPrivate = cu.decrypt(encryptedPrivate, secretKey);
 
-        PrivateKey senderPrivateKey = KeyFactory.getInstance("EC")
-                .generatePrivate(new PKCS8EncodedKeySpec(decryptedPrivate));
-
+        PrivateKey senderPrivateKey = us.
         // receiver 공개키
         byte[] receiverPub = Base64.getDecoder()
                 .decode(receiver.getChatPublicKey());

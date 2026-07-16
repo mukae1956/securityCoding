@@ -25,7 +25,6 @@ public class UserService {
     CipherUtil cu = new CipherUtil();
     HashUtil h = new HashUtil();
     UserRepository ur = new UserRepository();
-    User u = new User();
     DigitalSign ds = new DigitalSign();
     private User currentUser;
 
@@ -68,7 +67,6 @@ public class UserService {
         // 비밀번호 해시 → 비밀키
         byte[] hashPwd = h.digest(newPwd);
         SecretKey secretKey = new SecretKeySpec(hashPwd, "AES");
-        String password = Base64.getEncoder().encodeToString(hashPwd);
 
         // 로그인용 공개키 (Base64 문자열)
         String publicKey = Base64.getEncoder().encodeToString(userPublicKey.getEncoded());
@@ -80,12 +78,12 @@ public class UserService {
         byte[] encryptedLoginPrivate = cu.encrypt(userPrivateKey.getEncoded(), secretKey);
         String encryptedPrivateKey = Base64.getEncoder().encodeToString(encryptedLoginPrivate);
 
-        // 채팅용 개인키 암호화  ← 이 부분이 핵심!
+        // 채팅용 개인키 암호화
         byte[] encryptedChatPrivate = cu.encrypt(chatPrivateKey.getEncoded(), secretKey);
         String encryptedChatPrivateKey = Base64.getEncoder().encodeToString(encryptedChatPrivate);
 
-        // User 생성자: (id, pwd, name, 로그인공개키, 암호화로그인개인키, 채팅공개키, 암호화채팅개인키)
-        User user = new User(newId, password, newName,
+        // User 생성자
+        User user = new User(newId, newName,
                 publicKey, encryptedPrivateKey,
                 chatPublicKeyStr, encryptedChatPrivateKey);
 
@@ -110,14 +108,8 @@ public class UserService {
 
         // json파일에 있는 해시값 비밀번호와 비교하기 위함
         byte[] hashPwd = h.digest(pwd);
-        String jsonPwd = Base64.getEncoder().encodeToString(hashPwd);
 
         SecretKey secretKey= new SecretKeySpec(hashPwd, "AES");
-
-        if(!jsonPwd.equals(user.getPassword())) {
-            System.out.println("비밀번호가 틀렸습니다! 다시 입력해 주세요");
-            return;
-        }
 
         // json파일(user)에 존재하는 개인키 암호화문을 바이트로 변환
         byte[] encrypted = Base64.getDecoder().decode(user.getEncryptedPrivateKey());
@@ -129,6 +121,15 @@ public class UserService {
         PKCS8EncodedKeySpec keySpecPrivate = new PKCS8EncodedKeySpec(decryptedPrivateKey);
 
         PrivateKey privateKey = keyFactory.generatePrivate(keySpecPrivate);
+
+        //채팅용 개인키 암호화문에 대해서 복호화
+        byte [] encrytedChat = Base64.getDecoder().decode(user.getEncryptedChatPrivateKey());
+        byte[] decryptedChatPrivateKey = cu.decrypt(encrytedChat, secretKey);
+        PKCS8EncodedKeySpec keySpecChatPrivate = new PKCS8EncodedKeySpec(decryptedChatPrivateKey);
+        PrivateKey chatPrivateKey = keyFactory.generatePrivate(keySpecChatPrivate);
+        String chatPrivate = Base64.getEncoder().encodeToString(chatPrivateKey.getEncoded());
+
+        String getChatPrivateKey() {return chatPrivate;}
 
         // 공개키 가져오기
         byte[] bytePublicKey = Base64.getDecoder().decode(user.getPublicKey());
